@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/authorization_activity"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+    >
+
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center|bottom"
-    >
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true">
 
     <EditText
         android:id="@+id/UsernameField"
@@ -19,7 +24,6 @@
         android:layout_below="@id/UsernameField"
         android:hint="Password"
         android:inputType="textPassword">
-
     </EditText>
 
 
@@ -32,6 +36,6 @@
         android:text="Login">
 
     </Button>
-
+    </RelativeLayout>
 
 </RelativeLayout>
