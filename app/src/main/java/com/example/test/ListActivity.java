@@ -3,6 +3,7 @@ package com.example.test;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -17,6 +18,7 @@ public class ListActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.list_activity);
+        Log.i("ListActivity: ", "onCreate");
 
         Button addButton = (Button)findViewById(R.id.addButton);
         Button removeButton = (Button)findViewById(R.id.removeButton);
@@ -46,10 +48,36 @@ public class ListActivity extends Activity {
                 }
             }
         });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.i("ListActivity: ", "onStart");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.i("ListActivity: ", "onResume");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.i("ListActivity: ", "onPause");
+    }
 
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.i("ListActivity: ", "onStop");
+    }
 
-
-
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.i("ListActivity: ", "onDestroy");
     }
 }
