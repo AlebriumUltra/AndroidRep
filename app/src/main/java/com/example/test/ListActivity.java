@@ -20,6 +20,7 @@ public class ListActivity extends Activity {
         setContentView(R.layout.list_activity);
         Log.i("ListActivity: ", "onCreate");
 
+        Bundle arguments = getIntent().getExtras();
         Button addButton = (Button)findViewById(R.id.addButton);
         Button removeButton = (Button)findViewById(R.id.removeButton);
         EditText textField = (EditText)findViewById(R.id.enterField);
@@ -27,8 +28,9 @@ public class ListActivity extends Activity {
 
         ArrayList<String> textList = new ArrayList<>();
         ArrayAdapter<String> textAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, textList);
-        listViewer.setAdapter(textAdapter);
+        textList.add(arguments.get("Username").toString());
 
+        listViewer.setAdapter(textAdapter);
 
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override

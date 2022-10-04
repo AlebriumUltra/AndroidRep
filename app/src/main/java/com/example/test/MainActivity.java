@@ -20,14 +20,15 @@ public class MainActivity extends Activity {
         Button loginButton = (Button) findViewById(R.id.LoginButton);
         EditText usernameText = (EditText) findViewById(R.id.UsernameField);
         EditText passwordText = (EditText) findViewById(R.id.PasswordField);
-        Intent nextIntent = new Intent(this, ListActivity.class);
+        Intent nextIntent = new Intent(this, ListActivity.class); // Интент для вызова второй activity
 
 
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (usernameText.getText().toString().equals("")) {
-                    startActivity(nextIntent);
+                if (!usernameText.getText().toString().equals("")) {
+                    nextIntent.putExtra("Username", usernameText.getText().toString()); // Передаем данные из первой активности во вторую
+                    startActivity(nextIntent); // Вызываем вторую активность
                 }
             }
         });
@@ -37,7 +38,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onStart() {
         super.onStart();
-        Log.i("MainActivity: ", "onStart");
+        Log.i("MainActivity: ", "onStart"); // Переопределенные методы с выводом сообщений в системный журнал
     }
 
     @Override
