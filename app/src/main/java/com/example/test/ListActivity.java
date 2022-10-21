@@ -21,30 +21,30 @@ public class ListActivity extends Activity {
         Log.i("ListActivity: ", "onCreate");
 
         Bundle arguments = getIntent().getExtras();
-        Button addButton = (Button)findViewById(R.id.addButton);
-        Button removeButton = (Button)findViewById(R.id.removeButton);
-        EditText textField = (EditText)findViewById(R.id.enterField);
-        ListView listViewer = (ListView)findViewById(R.id.textList);
+        Button addButton = (Button) findViewById(R.id.addButton);
+        Button removeButton = (Button) findViewById(R.id.removeButton);
+        EditText textField = (EditText) findViewById(R.id.enterField);
+        ListView listViewer = (ListView) findViewById(R.id.textList);
 
         ArrayList<String> textList = new ArrayList<>();
         ArrayAdapter<String> textAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, textList);
         textList.add(arguments.get("Username").toString());
 
         listViewer.setAdapter(textAdapter);
-
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                textList.add(textField.getText().toString());
-                textAdapter.notifyDataSetChanged();
+                if (!textField.getText().toString().matches("")) {
+                    textList.add(textField.getText().toString());
+                    textAdapter.notifyDataSetChanged();
+                }
             }
         });
 
         removeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(!textList.isEmpty())
-                {
+                if (!textList.isEmpty()) {
                     textList.remove(textList.size() - 1);
                     textAdapter.notifyDataSetChanged();
                 }
