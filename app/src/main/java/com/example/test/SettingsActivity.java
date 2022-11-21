@@ -25,6 +25,7 @@ public class SettingsActivity extends AppCompatActivity {
     SharedPreferences pref;
     DataBaseHandler dbHandler;
     Intent backIntent;
+    Intent logoutIntent;
     SwitchCompat themeSwitch;
 
     @Override
@@ -36,9 +37,9 @@ public class SettingsActivity extends AppCompatActivity {
         Bundle arguments = getIntent().getExtras();
         pref = getSharedPreferences(arguments.get("Username").toString(), MODE_PRIVATE);
         backIntent = new Intent(this, ListActivity.class);
+        logoutIntent = new Intent(this, MainActivity.class);
 
-
-
+        Button deleteUser = (Button)findViewById(R.id.deleteUser);
         Button backButton = (Button)findViewById(R.id.backButton1);
         Button changePasswordButton = (Button) findViewById(R.id.changePasswordButton);
         EditText oldPasswordField = (EditText) findViewById(R.id.oldPasswordField);
@@ -53,6 +54,7 @@ public class SettingsActivity extends AppCompatActivity {
         {
             if(pref.getBoolean("theme", false))
             {
+                getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_YES);
                 themeSwitch.setChecked(true);
             }
             else
@@ -61,16 +63,13 @@ public class SettingsActivity extends AppCompatActivity {
             }
         }
 
-        themeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-                    if (isChecked) {
-                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-                    } else {
-                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-                    }
-                }
-            });
+        themeSwitch.setOnCheckedChangeListener((compoundButton, isChecked) -> {
+            if (isChecked) {
+                getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+            } else {
+                getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+            }
+        });
 
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -80,39 +79,58 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
+        deleteUser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        String userLogin = loginText1.getText().toString();
+                        dbHandler.deleteUser(userLogin);
+                        startActivity(logoutIntent);
+                        finish();
+                    }
+                }).start();
+            }
+        });
 
         changePasswordButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(!oldPasswordField.getText().toString().matches("") && !newPasswordField.getText().toString().matches(""))
                 {
-                        if(dbHandler.checkUser(new User(loginText1.getText().toString(), oldPasswordField.getText().toString())))
-                        {
-                            dbHandler.changePassword(loginText1.getText().toString(), newPasswordField.getText().toString());
-                            Toast toast = Toast.makeText(getApplicationContext(), "Change password success!", Toast.LENGTH_SHORT);
-                            toast.setGravity(Gravity.CENTER, 0, 0);
-                            toast.show();
+                    User user = new User(loginText1.getText().toString(), oldPasswordField.getText().toString());
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if(dbHandler.checkUser(user))
+                            {
+                                dbHandler.changePassword(loginText1.getText().toString(), newPasswordField.getText().toString());
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(getApplicationContext(), "Change password success!", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
+                            else
+                            {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(getApplicationContext(), "Wrong old password!", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
                         }
-                        else
-                        {
-                            Toast toast = Toast.makeText(getApplicationContext(), "Wrong old password!", Toast.LENGTH_SHORT);
-                            toast.setGravity(Gravity.CENTER, 0, 0);
-                            toast.show();
-                        }
+                    }).start();
                 }
                 else
                 {
-                    Toast toast = Toast.makeText(getApplicationContext(), "Empty fields!", Toast.LENGTH_SHORT);
-                    toast.setGravity(Gravity.CENTER, 0, 0);
-                    toast.show();
+                    Toast.makeText(getApplicationContext(), "Empty fields!", Toast.LENGTH_SHORT).show();
                 }
-
-
-
             }
         });
-
-
     }
 
     @Override

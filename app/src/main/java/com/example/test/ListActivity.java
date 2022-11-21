@@ -28,6 +28,8 @@ public class ListActivity extends AppCompatActivity {
     int position;
     Intent mainIntent;
     Intent settingsIntent;
+    ArrayAdapter<String> textAdapter;
+    ArrayList<String> textList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,11 +39,11 @@ public class ListActivity extends AppCompatActivity {
         {
             if(pref.getBoolean("theme", false))
             {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_YES);
             }
             else
             {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_NO);
             }
         }
 
@@ -63,15 +65,10 @@ public class ListActivity extends AppCompatActivity {
         settingsIntent = new Intent(this, SettingsActivity.class);
 
         loginText.setText(arguments.get("Username").toString());
-        ArrayList<String> textList = new ArrayList<>();
-        ArrayAdapter<String> textAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, textList);
-        List<User> userList = dbHandler.getAllUsers();
-        for(int i = 0; i < userList.size(); i++)
-        {
-            textList.add(userList.get(i).getLogin() + " " + userList.get(i).getPass());
-        }
-
+        textList = new ArrayList<>();
+        textAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, textList);
         listViewer.setAdapter(textAdapter);
+
         listViewer.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int pos, long id) {
@@ -94,13 +91,6 @@ public class ListActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if(position != -1)
                 {
-                    String text = textList.get(position);
-                    String[] tokens = text.split(" ");
-                    if(tokens.length == 2)
-                    {
-                        User user = new User(tokens[0], tokens[1]);
-                        dbHandler.deleteUser(user);
-                    }
                     textList.remove(position);
                     textAdapter.notifyDataSetChanged();
                 }
@@ -128,6 +118,24 @@ public class ListActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         Log.i("ListActivity: ", "onStart");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                List<User> userList = dbHandler.getAllUsers();
+                for(int i = 0; i < userList.size(); i++)
+                {
+                    textList.add(userList.get(i).getLogin() + " " + userList.get(i).getPass());
+                }
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        textAdapter.notifyDataSetChanged();
+                    }
+                });
+            }
+        }).start();
+
     }
 
     @Override
@@ -146,6 +154,7 @@ public class ListActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
+        textAdapter.clear();
         Log.i("ListActivity: ", "onStop");
     }
 

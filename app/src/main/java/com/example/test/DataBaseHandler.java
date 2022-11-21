@@ -38,8 +38,7 @@ public class DataBaseHandler extends SQLiteOpenHelper {
 
     public void addUser(User user) {
         SQLiteDatabase db = this.getWritableDatabase();
-        if(!checkUser(user))
-        {
+        if(!checkUser(user)) {
             ContentValues values = new ContentValues();
             values.put(DBContract.UserEntry.COLUMN_NAME_LOGIN, user.getLogin());
             values.put(DBContract.UserEntry.COLUMN_NAME_PASS, user.getPass());
@@ -48,10 +47,10 @@ public class DataBaseHandler extends SQLiteOpenHelper {
         db.close();
     }
 
-    public void deleteUser(User user)
+    public void deleteUser(String login)
     {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(DBContract.UserEntry.TABLE_NAME, DBContract.UserEntry.COLUMN_NAME_LOGIN + "=?", new String[]{user.getLogin()});
+        db.delete(DBContract.UserEntry.TABLE_NAME, DBContract.UserEntry.COLUMN_NAME_LOGIN + "=?", new String[]{login});
         db.close();
     }
 
@@ -60,6 +59,20 @@ public class DataBaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         String checkUserQuery =  "SELECT  * FROM " + DBContract.UserEntry.TABLE_NAME + " WHERE login = ? AND pass = ?;";
         Cursor cursor = db.rawQuery(checkUserQuery, new String[]{user.getLogin(), user.getPass()});
+        if(cursor.getCount() <= 0)
+        {
+            cursor.close();
+            return false;
+        }
+        cursor.close();
+        return true;
+    }
+
+    public boolean checkLogin(User user)
+    {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String checkUserQuery =  "SELECT  * FROM " + DBContract.UserEntry.TABLE_NAME + " WHERE login = ?;";
+        Cursor cursor = db.rawQuery(checkUserQuery, new String[]{user.getLogin()});
         if(cursor.getCount() <= 0)
         {
             cursor.close();

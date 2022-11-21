@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -49,11 +50,30 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (!usernameText.getText().toString().matches("") && !passwordText.getText().toString().matches(""))
                 {
-                    if(dbHandler.checkUser(new User(usernameText.getText().toString(), passwordText.getText().toString())))
-                    {
-                        nextIntent.putExtra("Username", usernameText.getText().toString());
-                        startActivity(nextIntent); // Вызываем вторую активность
-                    }
+                    User user = new User(usernameText.getText().toString(), passwordText.getText().toString());
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if(dbHandler.checkUser(new User(usernameText.getText().toString(), passwordText.getText().toString())))
+                            {
+                                nextIntent.putExtra("Username", usernameText.getText().toString());
+                                startActivity(nextIntent); // Вызываем вторую активность
+                            }
+                            else
+                            {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast toast = Toast.makeText(getApplicationContext(), "Wrong password or user doesn't exist!", Toast.LENGTH_SHORT);
+                                        toast.setGravity(Gravity.CENTER, 0, 0);
+                                        toast.show();
+                                    }
+                                });
+                            }
+                        }
+                    }).start();
+
+
                 }
             }
         });
@@ -62,8 +82,30 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (!usernameText.getText().toString().matches("") && !passwordText.getText().toString().matches("")) {
-                    dbHandler.addUser(new User(usernameText.getText().toString(), passwordText.getText().toString()));
+                    User user = new User(usernameText.getText().toString(), passwordText.getText().toString());
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if(!dbHandler.checkLogin(user)) {
+                                dbHandler.addUser(user);
+                                nextIntent.putExtra("Username", usernameText.getText().toString());
+                                startActivity(nextIntent); // Вызываем вторую активность
+                            }
+                            else
+                            {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast toast = Toast.makeText(getApplicationContext(), "User already exist!", Toast.LENGTH_SHORT);
+                                        toast.setGravity(Gravity.CENTER, 0, 0);
+                                        toast.show();
+                                    }
+                                });
+                            }
+                        }
+                    }).start();
                 }
+
             }
         });
     }
