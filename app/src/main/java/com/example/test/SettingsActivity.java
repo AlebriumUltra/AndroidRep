@@ -1,5 +1,7 @@
 package com.example.test;
 
+import static com.example.test.ProfileValidator.passwordIsValid;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -30,6 +32,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.settings_activity);
         dbHandler = new DataBaseHandler(this);
@@ -48,7 +51,7 @@ public class SettingsActivity extends AppCompatActivity {
         TextView loginText1 = (TextView) findViewById(R.id.loginText1);
         loginText1.setText(arguments.get("Username").toString());
 
-        themeSwitch = (SwitchCompat)findViewById(R.id.themeSwitch1);
+        /*themeSwitch = (SwitchCompat)findViewById(R.id.themeSwitch1);
 
         if(pref.contains("theme"))
         {
@@ -59,6 +62,7 @@ public class SettingsActivity extends AppCompatActivity {
             }
             else
             {
+                getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_NO);
                 themeSwitch.setChecked(false);
             }
         }
@@ -69,7 +73,7 @@ public class SettingsActivity extends AppCompatActivity {
             } else {
                 getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_NO);
             }
-        });
+        });*/
 
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -97,7 +101,7 @@ public class SettingsActivity extends AppCompatActivity {
         changePasswordButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(!oldPasswordField.getText().toString().matches("") && !newPasswordField.getText().toString().matches(""))
+                if(passwordIsValid(oldPasswordField.getText().toString()) && passwordIsValid(newPasswordField.getText().toString()))
                 {
                     User user = new User(loginText1.getText().toString(), oldPasswordField.getText().toString());
                     new Thread(new Runnable() {
@@ -127,7 +131,7 @@ public class SettingsActivity extends AppCompatActivity {
                 }
                 else
                 {
-                    Toast.makeText(getApplicationContext(), "Empty fields!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Incorrect password!", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -136,8 +140,8 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        SharedPreferences.Editor e = pref.edit();
+        /*SharedPreferences.Editor e = pref.edit();
         e.putBoolean("theme", themeSwitch.isChecked());
-        e.apply();
+        e.apply();*/
     }
 }

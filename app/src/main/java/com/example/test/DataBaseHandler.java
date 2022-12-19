@@ -102,6 +102,6 @@ public class DataBaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(DBContract.UserEntry.COLUMN_NAME_PASS, password);
-        db.update(DBContract.UserEntry.TABLE_NAME, contentValues, "login=" + login, null);
+        db.update(DBContract.UserEntry.TABLE_NAME, contentValues, "login=?", new String[]{login});
     }
 }

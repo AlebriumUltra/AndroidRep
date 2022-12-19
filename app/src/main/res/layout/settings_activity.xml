@@ -11,6 +11,7 @@
         android:layout_height="wrap_content"
         android:text="Night theme"
         android:layout_alignParentRight="true"
+        android:visibility="invisible"
         ></androidx.appcompat.widget.SwitchCompat>
 
     <TextView

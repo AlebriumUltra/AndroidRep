@@ -1,5 +1,8 @@
 package com.example.test;
 
+import static com.example.test.ProfileValidator.passwordIsValid;
+import static com.example.test.ProfileValidator.userNameIsValid;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -48,8 +51,10 @@ public class MainActivity extends AppCompatActivity {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!usernameText.getText().toString().matches("") && !passwordText.getText().toString().matches(""))
+                if (userNameIsValid(usernameText.getText().toString()) && passwordIsValid(passwordText.getText().toString()))
                 {
+                    loginButton.setEnabled(false);
+                    registerButton.setEnabled(false);
                     User user = new User(usernameText.getText().toString(), passwordText.getText().toString());
                     new Thread(new Runnable() {
                         @Override
@@ -70,10 +75,21 @@ public class MainActivity extends AppCompatActivity {
                                     }
                                 });
                             }
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    loginButton.setEnabled(true);
+                                    registerButton.setEnabled(true);
+                                }
+                            });
                         }
                     }).start();
-
-
+                }
+                else
+                {
+                    Toast toast = Toast.makeText(getApplicationContext(), "Incorrect username or password", Toast.LENGTH_SHORT);
+                    toast.setGravity(Gravity.CENTER, 0, 0);
+                    toast.show();
                 }
             }
         });
@@ -81,7 +97,9 @@ public class MainActivity extends AppCompatActivity {
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!usernameText.getText().toString().matches("") && !passwordText.getText().toString().matches("")) {
+                if (userNameIsValid(usernameText.getText().toString()) && passwordIsValid(passwordText.getText().toString())) {
+                    loginButton.setEnabled(false);
+                    registerButton.setEnabled(false);
                     User user = new User(usernameText.getText().toString(), passwordText.getText().toString());
                     new Thread(new Runnable() {
                         @Override
@@ -102,10 +120,22 @@ public class MainActivity extends AppCompatActivity {
                                     }
                                 });
                             }
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    loginButton.setEnabled(true);
+                                    registerButton.setEnabled(true);
+                                }
+                            });
                         }
                     }).start();
                 }
-
+                else
+                {
+                        Toast toast = Toast.makeText(getApplicationContext(), "Incorrect username or password", Toast.LENGTH_SHORT);
+                        toast.setGravity(Gravity.CENTER, 0, 0);
+                        toast.show();
+                }
             }
         });
     }
@@ -113,6 +143,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        if(activityPref.contains(usernameStringKey) && activityPref.contains(passwordStringKey))
+        {
+            usernameText.setText(activityPref.getString(usernameStringKey, ""));
+            passwordText.setText(activityPref.getString(passwordStringKey, ""));
+        }
         Log.i("MainActivity: ", "onStart"); // Переопределенные методы с выводом сообщений в системный журнал
     }
 
@@ -132,6 +167,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
+        SharedPreferences.Editor editor = activityPref.edit();
+        editor.putString(usernameStringKey, usernameText.getText().toString());
+        editor.putString(passwordStringKey, passwordText.getText().toString());
+        editor.apply();
         Log.i("MainActivity: ", "onStop");
     }
 
